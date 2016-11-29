@@ -66,6 +66,6 @@ class WhichProjectUses(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/api/whoknows', WhoKnows),
-    ('/api/whichprojectuses', WhichProjectUses)
+    ('/whoknows', WhoKnows),
+    ('/whichprojectuses', WhichProjectUses)
 ], debug=True)
