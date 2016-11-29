@@ -45,7 +45,7 @@ class WhichProjectUses(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		tech = self.request.get("text")
 		parsedTech = '"' + tech.replace(" ", "%20") + '"'
-		url = 'http://localhost:5000/api/public/whichprojectuses?q='+parsedTech+"&top=10"
+		url = 'http://stack.ciandt.com/api/public/whichprojectuses?q='+parsedTech+"&top=10"
 		try:
 			result = urlfetch.fetch(url)
 
