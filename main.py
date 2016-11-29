@@ -16,10 +16,7 @@ import webapp2
 from google.appengine.api import urlfetch
 import json
 
-class MainPage(webapp2.RequestHandler):
-	def get(self):
-		self.response.headers['Content-Type'] = 'application/json'
-		self.response.write('{"response_type":"in_channel","text":"Its 80 degrees right now.","attachments":[{"text":"Partly cloudy today and tomorrow"}]}')
+class WhoKnows(webapp2.RequestHandler):
 	def post(self):
 		self.response.headers['Content-Type'] = 'application/json'
 		tech = self.request.get("text")
@@ -31,18 +28,44 @@ class MainPage(webapp2.RequestHandler):
 			if result.status_code == 200:
 				data = json.loads(result.content)
 				if data:
-					names = "These are the top 10 dudes that know '"+ tech + "':\n\n"
+					names = "These are the *top 10 dudes* that know '*"+ tech + "*':\n\n"
 					for item in data:
-						names += item["name"] + " (" + item["login"] + ")"+ " from "+ item["city"] + "\n"
+						names += item["name"].title() + " (*" + item["login"] + "*)"+ " from "+ item["city"] + "\n"
 					
 					self.response.write(names)
 				else:
-					self.response.write("Sorry, nobody knows '" + tech + "'.")
+					self.response.write("Sorry, nobody knows '*" + tech + "*'.")
 			else:
 				self.response.status_code = result.status_code
 		except urlfetch.Error:
 			logging.exception('Caught exception fetching url')
 
+class WhichProjectUses(webapp2.RequestHandler):
+	def post(self):
+		self.response.headers['Content-Type'] = 'application/json'
+		tech = self.request.get("text")
+		parsedTech = '"' + tech.replace(" ", "%20") + '"'
+		url = 'http://localhost:5000/api/public/whichprojectuses?q='+parsedTech+"&top=10"
+		try:
+			result = urlfetch.fetch(url)
+
+			if result.status_code == 200:
+				data = json.loads(result.content)
+				if data:
+					projects = "These are the *top 10 project* that uses '*"+ tech + "*':\n\n"
+					for item in data:
+						projects += "*" + item["contract"].title() + " - " + item["flow"].title() + "*, has *" + item["technology"] + "* with total skill of *" + str(item["achieve"]) + "*\n"
+					
+					self.response.write(projects)
+				else:
+					self.response.write("Sorry, no project uses '*" + tech + "*'.")
+			else:
+				self.response.status_code = result.status_code
+		except urlfetch.Error:
+			logging.exception('Caught exception fetching url')
+
+
 app = webapp2.WSGIApplication([
-    ('/whoknows', MainPage),
+    ('/api/whoknows', WhoKnows),
+    ('/api/whichprojectuses', WhichProjectUses)
 ], debug=True)
