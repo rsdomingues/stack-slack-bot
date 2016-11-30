@@ -28,7 +28,7 @@ class WhoKnows(webapp2.RequestHandler):
 			if result.status_code == 200:
 				data = json.loads(result.content)
 				if data:
-					names = "These are the *top 10 dudes* that know '*"+ tech + "*':\n\n"
+					names = "These are the *top 10 dudes* that know *"+ tech + "*:\n\n"
 					for item in data:
 						names += item["name"].title() + " (*" + item["login"] + "*)"+ " from "+ item["city"] + "\n"
 					
@@ -36,7 +36,7 @@ class WhoKnows(webapp2.RequestHandler):
 				else:
 					self.response.write("Sorry, nobody knows '*" + tech + "*'.")
 			else:
-				self.response.status_code = result.status_code
+				self.response.status_int = result.status_code
 		except urlfetch.Error:
 			logging.exception('Caught exception fetching url')
 
@@ -52,15 +52,15 @@ class WhichProjectUses(webapp2.RequestHandler):
 			if result.status_code == 200:
 				data = json.loads(result.content)
 				if data:
-					projects = "These are the *top 10 project* that uses '*"+ tech + "*':\n\n"
+					projects = "These are the *top 10 project* that uses *"+ tech + "*:\n\n"
 					for item in data:
-						projects += "*" + item["contract"].title() + " - " + item["flow"].title() + "*, has *" + item["technology"] + "* with total skill of *" + str(item["achieve"]) + "*\n"
+						projects += "*" + item["contract"].replace("\n", "").title() + " [" + item["flow"].replace("\n", "").title() + "]*, has *" + item["technology"] + "* with total skill of *" + str(item["achieve"]) + "*\n"
 					
 					self.response.write(projects)
 				else:
 					self.response.write("Sorry, no project uses '*" + tech + "*'.")
 			else:
-				self.response.status_code = result.status_code
+				self.response.status_int = result.status_code
 		except urlfetch.Error:
 			logging.exception('Caught exception fetching url')
 
